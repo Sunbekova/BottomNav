@@ -1,11 +1,9 @@
 package com.example.exampleapp
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.exampleapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -14,30 +12,29 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        replaceFragment(HomeFragment())
 
-        binding.bottomNav.setOnItemSelectedListener {
+        // Set up NavHostFragment using the NavController
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        val navController = navHostFragment.navController
 
-            when(it.itemId){
+        // Setup BottomNavigationView to work with NavController
+        binding.bottomNav.setupWithNavController(navController)
 
-                R.id.home -> replaceFragment(HomeFragment())
-                R.id.edit -> replaceFragment(AddTextFragment())
-
-                else ->{
-
+        // Optional: Handle item selection using NavController
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.home -> {
+                    navController.navigate(R.id.homeFragment)
+                    true
                 }
+                R.id.edit -> {
+                    navController.navigate(R.id.addTextFragment)
+                    true
+                }
+                else -> false
             }
-            true
         }
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.frame_layout, fragment)
-        fragmentTransaction.commit()
     }
 }
